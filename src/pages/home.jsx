@@ -5,11 +5,7 @@ import { useEffect } from "react";
 
 
 const Home = () => {
-    const dispatch = useDispatch()
-    useEffect(() => {
-        dispatch(getEmployeesDispatch(true))
 
-    }, [])
     const employees = useSelector(s => s.employees);
     console.log(employees);
     return (<>
