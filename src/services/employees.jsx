@@ -1,7 +1,7 @@
 import axios from "axios"
 import * as actionsNames from '../store/action'
 
-const baseURL = 'https://localhost:7009/api'
+const baseURL = 'http://localhost:5058/api'
 
 export const getEmployeesDispatch = (status) => {
     return dispatch => {

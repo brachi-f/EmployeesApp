@@ -7,6 +7,7 @@ import Home from './pages/home'
 import List from './pages/list'
 import { useDispatch } from 'react-redux'
 import { getEmployeesDispatch } from './services/employees'
+import Edit from './pages/edit'
 
 function App() {
   const dispatch = useDispatch()
@@ -18,6 +19,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/employees' element={<List/>} />
+        <Route path='/employees/:id' element={<Edit/>}/>
       </Routes>
     </>
   )
