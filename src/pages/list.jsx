@@ -11,29 +11,33 @@ const List = () => {
         navigate(`${id}`)
     }
     const list = useSelector(s => s.employees)
+    const toDate = (value) => {
+        let date = new Date(value)
+        return date.toLocaleDateString()
+    }
     return (
         <>
-            <Table celled>
+            <Table celled textAlign="center" style={{ width: '50vw' }}>
                 <TableHeader>
                     <TableRow>
+                        <TableHeaderCell>ID number</TableHeaderCell>
+                        <TableHeaderCell>Last Name</TableHeaderCell>
+                        <TableHeaderCell>First Name</TableHeaderCell>
+                        <TableHeaderCell>Start Date</TableHeaderCell>
                         <TableHeaderCell></TableHeaderCell>
-                        <TableHeaderCell>תאריך התחלה</TableHeaderCell>
-                        <TableHeaderCell>שם פרטי</TableHeaderCell>
-                        <TableHeaderCell>שם משפחה</TableHeaderCell>
-                        <TableHeaderCell>תעודת זהות</TableHeaderCell>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {list.map((emp) =>
                         <TableRow key={emp.id}>
+                            <TableCell>{emp.identity}</TableCell>
+                            <TableCell>{emp.familyName}</TableCell>
+                            <TableCell>{emp.firstName}</TableCell>
+                            <TableCell>{toDate(emp.dateStart)}</TableCell>
                             <TableCell>
                                 <Button icon='trash' onClick={() => deleteEmp(emp.id)} />
                                 <Button icon='edit' onClick={() => editEmp(emp.id)} />
                             </TableCell>
-                            <TableCell>{emp.dateStart}</TableCell>
-                            <TableCell>{emp.firstName}</TableCell>
-                            <TableCell>{emp.familyName}</TableCell>
-                            <TableCell>{emp.identity}</TableCell>
                         </TableRow>
                     )}
                 </TableBody>
@@ -55,7 +59,7 @@ const deleteEmp = (id) => {
                 Swal.fire({
                     icon: "success",
                     showConfirmButton: false,
-                    title: 'נמחק בהצלחה',
+                    title: 'Deleted successfully',
                     timer: 1500
                 })
             }).catch(err => {
