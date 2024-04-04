@@ -13,11 +13,13 @@ import { useSelector } from 'react-redux'
 const Edit = () => {
     const [employee, setEmployee] = useState(null);
     const [roles, setRoles] = useState([]);
+    const [choosenRoles, setChoosenRoles] = useState([])
     let { id } = useParams();
     const roleList = useSelector(s => s.roles)
     const getRole = (id) => {
         return roleList.find(r => r.id == id)
     }
+    const [options, setOptions] = useState([])
     useEffect(() => {
         empService.getEmployeeById(id).then(res => {
             setEmployee(res.data)
@@ -67,12 +69,24 @@ const Edit = () => {
     useEffect(() => {
         reset(employee);
     }, [employee]);
+
     useEffect(() => {
+        setOptions(roleList.map((rl) =>
+        ({ key: rl.id, value: rl.id, text: rl.name, disabled: choosenRoles.includes(rl.id) }
+        )))
+        console.log(options)
+    }, [choosenRoles])
+    useEffect(() => {
+        setChoosenRoles([])
+        let temp = []
         roles?.map((r) => {
             r.dateStart = new Date(r.dateStart).toISOString().substring(0, 10)
             RolesAppend(r)
+            temp.push(r.roleId)
         })
+        setChoosenRoles(temp)
     }, [roles])
+
     return (
         <Form onSubmit={handleSubmit(send)}>
             <TextField
@@ -118,21 +132,19 @@ const Edit = () => {
             />
             <Select
                 label='Gender'
-                //select
                 {...register('gender')}
                 value={employee?.gender || '2'}
                 fullWidth
-            //defaultValue={employee ? employee.gender : '2'}
             >
-                <MenuItem value='2' disabled /* selected={!employee}*/>
+                <MenuItem value='2' disabled >
                     <Icon name='female' />|
                     <Icon name='male' />
                     Gender</MenuItem>
-                <MenuItem value='0' /*selected={employee && employee.gender == 0}*/>
+                <MenuItem value='0' >
                     <Icon name='female' />
                     Female</MenuItem>
                 <MenuItem value='1' >
-                    <Icon name='male' /*selected={employee && employee.gender == 1}*/ />
+                    <Icon name='male' />
                     Male</MenuItem>
             </Select>
             <Segment>
@@ -142,10 +154,14 @@ const Edit = () => {
                         <Segment>
                             <Form.Field>
                                 <FormLabel>Role</FormLabel>
-                                <select {...register(`roles.${index}.name`)} defaultValue={r.roleId}>
-                                    {/* <option key={0} value={0} disabled>Role</option> */}
-                                    {roleList.map((role) =>
-                                        <option key={role.id} value={role.id}>{role.name}</option>)}
+                                <select {...register(`roles.${index}.name`)} defaultValue={r.roleId} onChange={(e) => {
+                                    let temp = choosenRoles
+                                    temp[index] = e.target.value
+                                    setChoosenRoles(temp)
+                                }}>
+                                    {options.map((opt) =>
+                                        <option key={opt.key} value={opt.value} disabled={opt.disabled || opt.key==r.roleId} onClick={()=>opt.disabled = !opt.disabled}>{opt.text}</option>
+                                    )}
                                 </select>
                             </Form.Field>
                         </Segment>
@@ -163,20 +179,25 @@ const Edit = () => {
                                 margin='dense'
                             />
                         </Segment>
+                        <Segment>
+                            <Button icon='trash' size='medium' onClick={() => { RolesRemove(index) }} />
+                        </Segment>
                     </SegmentGroup>
                 )}
-                <Button animated='vertical' size='big' onClick={()=>RolesAppend({id:0,name:'',management:fa})}>
+                <Button animated='vertical' size='big' onClick={() => RolesAppend({ id: 0, name: '', management: false })}>
                     <ButtonContent visible>Add Role</ButtonContent>
                     <ButtonContent hidden>
                         <Icon name='plus' />
                     </ButtonContent>
                 </Button>
             </Segment>
-            <Button onClick={() => {
-                console.log("values", getValues())
-                console.log("roles", RolesFields)
-            }}>do</Button>
-        </Form>
+            <Button animated='vertical' type='submit'>
+                <ButtonContent visible>Save Changes</ButtonContent>
+                <ButtonContent hidden>
+                    <Icon name='save' />
+                </ButtonContent>
+            </Button>
+        </Form >
     )
 
 }
