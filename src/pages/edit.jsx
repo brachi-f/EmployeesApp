@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Form, Icon } from 'semantic-ui-react'
+import { Button, Form, Icon, Segment, SegmentGroup } from 'semantic-ui-react'
 import * as yup from 'yup'
 import { useParams } from 'react-router-dom'
 import * as empService from '../services/employees'
 import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
 import { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 
 
 const Edit = () => {
     const [employee, setEmployee] = useState(null);
     const [roles, setRoles] = useState([]);
     let { id } = useParams();
+    const roleList = useSelector(s => s.roles)
+    const getRole = (id) => {
+        return roleList.find(r => r.id == id)
+    }
     useEffect(() => {
         empService.getEmployeeById(id).then(res => {
             setEmployee(res.data)
@@ -39,7 +44,6 @@ const Edit = () => {
             })
         )
     })
-
     const { register, handleSubmit, reset, formState = { errors }, control, getValues } = useForm({
         resolver: yupResolver(empSchema),
         defaultValues: useMemo(() => {
@@ -130,7 +134,17 @@ const Edit = () => {
             </Select>
             <h4>Roles</h4>
             {RolesFields.map((r) =>
-                <p key={r.id}>{r.roleId}</p>
+                <SegmentGroup horizontal key={r.id}>
+                    <Segment>
+                        //name
+                    </Segment>
+                    <Segment>
+                        //management
+                    </Segment>
+                    <Segment>
+                        //date
+                    </Segment>
+                </SegmentGroup>
             )}
             <Button onClick={() => {
                 console.log("values", getValues())
