@@ -8,11 +8,13 @@ import List from './pages/list'
 import { useDispatch } from 'react-redux'
 import { getEmployeesDispatch } from './services/employees'
 import Edit from './pages/edit'
+import { getRolesDispatch } from './services/roles'
 
 function App() {
   const dispatch = useDispatch()
   useEffect(() => {
       dispatch(getEmployeesDispatch(true))
+      dispatch(getRolesDispatch())
   }, [])
   return (
     <>

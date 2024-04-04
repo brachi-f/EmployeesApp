@@ -11,11 +11,15 @@ import { useMemo } from 'react'
 
 const Edit = () => {
     const [employee, setEmployee] = useState(null);
+    const [roles, setRoles] = useState([]);
     let { id } = useParams();
     useEffect(() => {
         empService.getEmployeeById(id).then(res => {
             setEmployee(res.data)
         }).catch(err => console.error("Error by getting employee by id: ", err))
+        empService.getRolesOfEmployee(id).then(res => {
+            setRoles(res.data)
+        }).catch(err => console.error('Error by getting roles of employee: ', err))
     }, [])
 
     const empSchema = yup.object({
@@ -35,7 +39,7 @@ const Edit = () => {
             })
         )
     })
-   
+
     const { register, handleSubmit, reset, formState = { errors }, control, getValues } = useForm({
         resolver: yupResolver(empSchema),
         defaultValues: useMemo(() => {
@@ -58,8 +62,10 @@ const Edit = () => {
     }
     useEffect(() => {
         reset(employee);
-        employee?.roles?.map((r) => RolesAppend(r))
     }, [employee]);
+    useEffect(() => {
+        roles?.map((r) => RolesAppend(r))
+    }, [roles])
     return (
         <Form onSubmit={handleSubmit(send)}>
             <TextField
@@ -107,9 +113,9 @@ const Edit = () => {
                 label='Gender'
                 //select
                 {...register('gender')}
-                //  value={employee == null? '2' : employee.gender.toString()}
+                value={employee?.gender || '2'}
                 fullWidth
-                defaultValue={employee ? employee.gender : '2'}
+            //defaultValue={employee ? employee.gender : '2'}
             >
                 <MenuItem value='2' disabled /* selected={!employee}*/>
                     <Icon name='female' />|
@@ -123,11 +129,12 @@ const Edit = () => {
                     Male</MenuItem>
             </Select>
             <h4>Roles</h4>
-            {RolesFields.map((r) => <>
-                <p>{r.name}</p>
-            </>)}
+            {RolesFields.map((r) =>
+                <p key={r.id}>{r.roleId}</p>
+            )}
             <Button onClick={() => {
                 console.log("values", getValues())
+                console.log("roles", RolesFields)
             }}>do</Button>
         </Form>
     )
