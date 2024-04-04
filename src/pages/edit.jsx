@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Form, Icon, Segment, SegmentGroup } from 'semantic-ui-react'
+import { Button, ButtonContent, Checkbox, Form, Icon, Segment, SegmentGroup } from 'semantic-ui-react'
 import * as yup from 'yup'
 import { useParams } from 'react-router-dom'
 import * as empService from '../services/employees'
-import { FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material'
+import { FormControl, FormLabel, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 
@@ -68,7 +68,10 @@ const Edit = () => {
         reset(employee);
     }, [employee]);
     useEffect(() => {
-        roles?.map((r) => RolesAppend(r))
+        roles?.map((r) => {
+            r.dateStart = new Date(r.dateStart).toISOString().substring(0, 10)
+            RolesAppend(r)
+        })
     }, [roles])
     return (
         <Form onSubmit={handleSubmit(send)}>
@@ -132,20 +135,43 @@ const Edit = () => {
                     <Icon name='male' /*selected={employee && employee.gender == 1}*/ />
                     Male</MenuItem>
             </Select>
-            <h4>Roles</h4>
-            {RolesFields.map((r) =>
-                <SegmentGroup horizontal key={r.id}>
-                    <Segment>
-                        //name
-                    </Segment>
-                    <Segment>
-                        //management
-                    </Segment>
-                    <Segment>
-                        //date
-                    </Segment>
-                </SegmentGroup>
-            )}
+            <Segment>
+                <h4>Roles</h4>
+                {RolesFields.map((r, index) =>
+                    <SegmentGroup horizontal key={r.id}>
+                        <Segment>
+                            <Form.Field>
+                                <FormLabel>Role</FormLabel>
+                                <select {...register(`roles.${index}.name`)} defaultValue={r.roleId}>
+                                    {/* <option key={0} value={0} disabled>Role</option> */}
+                                    {roleList.map((role) =>
+                                        <option key={role.id} value={role.id}>{role.name}</option>)}
+                                </select>
+                            </Form.Field>
+                        </Segment>
+                        <Segment>
+                            <FormLabel>A managerial position?</FormLabel>
+                            <br />
+                            <Switch {...register(`roles.${index}.management`)} defaultChecked={r.management} />
+                        </Segment>
+                        <Segment>
+                            <TextField
+                                label='date of start'
+                                type='date'
+                                {...register(`roles.${index}.dateStart`)}
+                                variant='standard'
+                                margin='dense'
+                            />
+                        </Segment>
+                    </SegmentGroup>
+                )}
+                <Button animated='vertical' size='big' onClick={()=>RolesAppend({id:0,name:'',management:fa})}>
+                    <ButtonContent visible>Add Role</ButtonContent>
+                    <ButtonContent hidden>
+                        <Icon name='plus' />
+                    </ButtonContent>
+                </Button>
+            </Segment>
             <Button onClick={() => {
                 console.log("values", getValues())
                 console.log("roles", RolesFields)
