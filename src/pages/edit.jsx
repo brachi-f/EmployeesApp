@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Form, FormField, FormGroup, FormRadio, Icon, Label, Popup, Radio, Segment } from 'semantic-ui-react'
+import { Form } from 'semantic-ui-react'
 import * as yup from 'yup'
 import { useParams } from 'react-router-dom'
 import * as empService from '../services/employees'
+import { TextField } from '@mui/material'
+import { useMemo } from 'react'
 
 
 const Edit = () => {
@@ -16,6 +18,7 @@ const Edit = () => {
             setEmployee(res.data)
         }).catch(err => console.error("Error by getting employee by id: ", err))
     }, [])
+
     console.log("employee:", employee)
     const empSchema = yup.object({
         firstName: yup.string().required(),
@@ -33,41 +36,38 @@ const Edit = () => {
         //     })
         // )
     })
-    const { register, handleSubmit, formState = { errors }, control } = useForm({
-        resolver: yupResolver(empSchema)
+    const { register, handleSubmit, reset, formState = { errors }, control } = useForm({
+        resolver: yupResolver(empSchema),
+        defaultValues: useMemo(() =>
+            employee
+            , [employee])
     })
     const send = (data) => {
         console.log(data)
     }
+    useEffect(() => {
+        reset(employee);
+    }, [employee]);
     return (
         <Form onSubmit={handleSubmit(send)}>
-            <Popup content="First Name" trigger={
-                <div className="ui left icon input">
-                    <input {...register("firstName")} defaultValue={employee ? employee.firstName : ""} />
-                    <i aria-hidden="true" className="user icon"></i>
-                </div>} />
-            <Popup content="Family Name" trigger={
-                <div className="ui left icon input">
-                    <input {...register("familyName")} defaultValue={employee ? employee.familyName : ""} />
-                    <i aria-hidden="true" className="user icon"></i>
-                </div>} />
-            <Popup content="ID Number" trigger={
-                <div className="ui left icon input">
-                    <input {...register("identity")} defaultValue={employee ? employee.identity : ""} />
-                    <i aria-hidden="true" className="id card icon"></i>
-                </div>} />
-            <Popup content="Date of birth" trigger={
-                <div className="ui left icon input">
-                    <input type='date' {...register("dateOfBirth")} defaultValue={employee ? new Date(employee.dateOfBirth).toISOString().substring(0, 10) : null} />
-                    <i aria-hidden="true" className="birthday cake icon"></i>
-                </div>} />
-            <Popup content="Start Date" trigger={
-                <div className="ui left icon input">
-                    <input type='date' {...register("dateStart")} defaultValue={employee ? new Date(employee.dateStart).toISOString().substring(0, 10) : ""} />
-                    <i aria-hidden="true" className="calendar icon"></i>
-                </div>} />
-            
-            <Button type='submit' onClick={() => console.log(formState.errors)}>submit</Button>
+            <TextField
+                autoFocus
+                label='First Name'
+                {...register("firstName")}
+                variant='standard'
+                type='text'
+                margin='dense'
+                fullWidth
+            />
+            <TextField
+
+                label='Family Name'
+                {...register("familyName")}
+                variant='standard'
+                type='text'
+                margin='dense'
+                fullWidth
+            />
         </Form>
     )
 
