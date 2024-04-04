@@ -16,3 +16,6 @@ export const getEmployeesDispatch = (status) => {
 export const deleteEmployee = (id)=>{
     return axios.put(baseURL+`/Employee/delete/${id}`)
 }
+export const getEmployeeById=(id)=>{
+    return axios.get(baseURL+`/Employee/${id}`)
+}
