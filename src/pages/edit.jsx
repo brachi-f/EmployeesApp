@@ -212,3 +212,35 @@ const handleSelectChange = (index, selectedRoleId) => {
     });
 };
 */
+/*
+I'm only able to provide assistance related to programming and code topics.
+
+
+If you are encountering an error message in MUI saying that it cannot switch from a controlled to an uncontrolled field, you might want to ensure that you are setting the default value properly for the controlled components.
+
+
+You can resolve this issue by checking the way you are setting default values for the controlled components like the Select component in Material-UI. Make sure you are updating the value correctly based on the existing data while using hookform.
+
+
+One approach is to set the default value for the gender field using setValue after employee is set. This way, you can avoid the error related to switching from controlled to uncontrolled fields.
+
+מה זה רכיב מבוקר ומה זה רכיב לא מבוקר?
+
+A controlled component is a React component where the value of the component is controlled by React state. This means that the component's value is managed by React state and updated through state changes. Controlled components provide a single source of truth for the value, allowing React to have full control over the component's behavior.
+
+
+On the other hand, an uncontrolled component is a component where the value is handled by the DOM itself. In uncontrolled components, the state is not managed by React but rather by the DOM. The value of an uncontrolled component is usually set using a default or initial value in the HTML markup, and then the value is read directly from the DOM when needed.
+
+
+In the context of forms in React, controlled components are generally preferred because they provide a more predictable and manageable way to handle form input values and changes. Controlled components help maintain the component state within the React component hierarchy.
+
+ואיך אפשר להגדיר שדה כמבוקר או לא
+
+You can define a field as controlled or uncontrolled in React based on whether its value is controlled by React state (controlled) or by the DOM itself (uncontrolled).
+
+
+To explicitly determine if a field is controlled or uncontrolled, you need to consider how the value of the field is managed and updated. If the value of the field is directly set by React state and updated through state changes, then it is a controlled component. On the other hand, if the value of the field is set in the HTML markup and read directly from the DOM, it is considered an uncontrolled component.
+
+
+In React, you can explicitly set a field as controlled by managing its value through React state using methods like useState or useReducer, ensuring that changes to the value are handled through state updates. For uncontrolled components, the value is typically managed by the DOM, and React does not have direct control over its value changes.
+*/
