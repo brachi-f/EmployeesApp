@@ -202,4 +202,13 @@ const Edit = () => {
 
 }
 export default Edit;
-
+/*
+// Update the selected roles in choosenRoles state and trigger re-render of options
+const handleSelectChange = (index, selectedRoleId) => {
+    setChoosenRoles(prevChoosenRoles => {
+        const updatedChoosenRoles = [...prevChoosenRoles]; // Create a copy of choosenRoles array
+        updatedChoosenRoles[index] = selectedRoleId; // Update the selected role at the corresponding index
+        return updatedChoosenRoles;
+    });
+};
+*/
