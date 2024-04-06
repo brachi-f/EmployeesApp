@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, ButtonContent, Checkbox, Form, Icon, Segment, SegmentGroup } from 'semantic-ui-react'
+import { Button, ButtonContent, Form, Icon, Segment, SegmentGroup } from 'semantic-ui-react'
 import * as yup from 'yup'
 import { useParams } from 'react-router-dom'
 import * as empService from '../services/employees'
-import { FormControl, FormLabel, InputLabel, MenuItem, Select, Switch, TextField } from '@mui/material'
+import { FormLabel, FormControl, MenuItem, Select, Switch, TextField, InputLabel, OutlinedInput } from '@mui/material'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
+import { Cake, CalendarToday, Contacts, Person, Today } from '@mui/icons-material'
+
 
 
 const Edit = () => {
-    const [employee, setEmployee] = useState(null);
+    const [employee, setEmployee] = useState();
     const [roles, setRoles] = useState([]);
-    const [choosenRoles, setChoosenRoles] = useState([])
     let { id } = useParams();
-    const roleList = useSelector(s => s.roles)
-    const getRole = (id) => {
-        return roleList.find(r => r.id == id)
-    }
-    const [options, setOptions] = useState([])
+    const roleList = useSelector(s => s.roles);
+
     useEffect(() => {
         empService.getEmployeeById(id).then(res => {
             setEmployee(res.data)
@@ -46,7 +44,7 @@ const Edit = () => {
             })
         )
     })
-    const { register, handleSubmit, reset, formState = { errors }, control, getValues } = useForm({
+    const { register, handleSubmit, reset, formState = { errors }, control, getValues, setValue } = useForm({
         resolver: yupResolver(empSchema),
         defaultValues: useMemo(() => {
             if (employee) {
@@ -59,33 +57,25 @@ const Edit = () => {
         }
             , [employee])
     })
-    const { fields: RolesFields, append: RolesAppend, remove: RolesRemove } = useFieldArray({
+    const { fields: RolesFields, append: RolesAppend, remove: RolesRemove, } = useFieldArray({
         control,
         name: "roles",
     });
+    useEffect(() => {
+        // RolesFields.forEach(r => RolesRemove(r))
+        roles.forEach(r => {
+            r.dateStart = new Date(r.dateStart).toISOString().substring(0, 10)
+            RolesAppend(r)
+        })
+    }, [roles])
+    //to write on submit
     const send = (data) => {
         console.log(data)
     }
+    //to move up
     useEffect(() => {
         reset(employee);
     }, [employee]);
-
-    useEffect(() => {
-        setOptions(roleList.map((rl) =>
-        ({ key: rl.id, value: rl.id, text: rl.name, disabled: choosenRoles.includes(rl.id) }
-        )))
-        console.log(options)
-    }, [choosenRoles])
-    useEffect(() => {
-        setChoosenRoles([])
-        let temp = []
-        roles?.map((r) => {
-            r.dateStart = new Date(r.dateStart).toISOString().substring(0, 10)
-            RolesAppend(r)
-            temp.push(r.roleId)
-        })
-        setChoosenRoles(temp)
-    }, [roles])
 
     return (
         <Form onSubmit={handleSubmit(send)}>
@@ -97,10 +87,22 @@ const Edit = () => {
                 type='text'
                 margin='dense'
                 fullWidth
+                style={{ border: '0px' }}
+                InputProps={{
+                    startAdornment: (
+                        <Person />
+                    ),
+                }}
             />
             <TextField
                 label='Family Name'
                 {...register("familyName")}
+                style={{ border: '0px' }}
+                InputProps={{
+                    startAdornment: (
+                        <Person />
+                    ),
+                }}
                 variant='standard'
                 type='text'
                 margin='dense'
@@ -113,6 +115,12 @@ const Edit = () => {
                 type='text'
                 margin='dense'
                 fullWidth
+                style={{ border: '0px' }}
+                InputProps={{
+                    startAdornment: (
+                        <Contacts />
+                    ),
+                }}
             />
             <TextField
                 label='Birth date'
@@ -121,6 +129,12 @@ const Edit = () => {
                 type='date'
                 margin='dense'
                 fullWidth
+                style={{ border: '0px' }}
+                InputProps={{
+                    startAdornment: (
+                        <Cake />
+                    ),
+                }}
             />
             <TextField
                 label='Start date'
@@ -129,11 +143,17 @@ const Edit = () => {
                 type='date'
                 margin='dense'
                 fullWidth
+                style={{ border: '0px' }}
+                InputProps={{
+                    startAdornment: (
+                        <Today />
+                    ),
+                }}
             />
             <Select
                 label='Gender'
                 {...register('gender')}
-                value={employee?.gender || '2'}
+                defaultValue='2'
                 fullWidth
             >
                 <MenuItem value='2' disabled >
@@ -154,14 +174,11 @@ const Edit = () => {
                         <Segment>
                             <Form.Field>
                                 <FormLabel>Role</FormLabel>
-                                <select {...register(`roles.${index}.name`)} defaultValue={r.roleId} onChange={(e) => {
-                                    let temp = choosenRoles
-                                    temp[index] = e.target.value
-                                    setChoosenRoles(temp)
-                                }}>
-                                    {options.map((opt) =>
-                                        <option key={opt.key} value={opt.value} disabled={opt.disabled || opt.key==r.roleId} onClick={()=>opt.disabled = !opt.disabled}>{opt.text}</option>
-                                    )}
+                                <select
+                                    {...register(`roles.${index}.name`)}
+                                    defaultValue={r.roleId}
+                                >
+                                    {roleList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                                 </select>
                             </Form.Field>
                         </Segment>
@@ -177,6 +194,12 @@ const Edit = () => {
                                 {...register(`roles.${index}.dateStart`)}
                                 variant='standard'
                                 margin='dense'
+                                style={{ border: '0px' }}
+                                InputProps={{
+                                    startAdornment: (
+                                        <CalendarToday />
+                                    ),
+                                }}
                             />
                         </Segment>
                         <Segment>
@@ -202,45 +225,5 @@ const Edit = () => {
 
 }
 export default Edit;
-/*
-// Update the selected roles in choosenRoles state and trigger re-render of options
-const handleSelectChange = (index, selectedRoleId) => {
-    setChoosenRoles(prevChoosenRoles => {
-        const updatedChoosenRoles = [...prevChoosenRoles]; // Create a copy of choosenRoles array
-        updatedChoosenRoles[index] = selectedRoleId; // Update the selected role at the corresponding index
-        return updatedChoosenRoles;
-    });
-};
-*/
-/*
-I'm only able to provide assistance related to programming and code topics.
 
 
-If you are encountering an error message in MUI saying that it cannot switch from a controlled to an uncontrolled field, you might want to ensure that you are setting the default value properly for the controlled components.
-
-
-You can resolve this issue by checking the way you are setting default values for the controlled components like the Select component in Material-UI. Make sure you are updating the value correctly based on the existing data while using hookform.
-
-
-One approach is to set the default value for the gender field using setValue after employee is set. This way, you can avoid the error related to switching from controlled to uncontrolled fields.
-
-מה זה רכיב מבוקר ומה זה רכיב לא מבוקר?
-
-A controlled component is a React component where the value of the component is controlled by React state. This means that the component's value is managed by React state and updated through state changes. Controlled components provide a single source of truth for the value, allowing React to have full control over the component's behavior.
-
-
-On the other hand, an uncontrolled component is a component where the value is handled by the DOM itself. In uncontrolled components, the state is not managed by React but rather by the DOM. The value of an uncontrolled component is usually set using a default or initial value in the HTML markup, and then the value is read directly from the DOM when needed.
-
-
-In the context of forms in React, controlled components are generally preferred because they provide a more predictable and manageable way to handle form input values and changes. Controlled components help maintain the component state within the React component hierarchy.
-
-ואיך אפשר להגדיר שדה כמבוקר או לא
-
-You can define a field as controlled or uncontrolled in React based on whether its value is controlled by React state (controlled) or by the DOM itself (uncontrolled).
-
-
-To explicitly determine if a field is controlled or uncontrolled, you need to consider how the value of the field is managed and updated. If the value of the field is directly set by React state and updated through state changes, then it is a controlled component. On the other hand, if the value of the field is set in the HTML markup and read directly from the DOM, it is considered an uncontrolled component.
-
-
-In React, you can explicitly set a field as controlled by managing its value through React state using methods like useState or useReducer, ensuring that changes to the value are handled through state updates. For uncontrolled components, the value is typically managed by the DOM, and React does not have direct control over its value changes.
-*/
