@@ -1,3 +1,4 @@
 
 export const GET_EMPLOYEES = "GET_EMPLOYEES"
 export const GET_ROLES = "GET_ROLES"
+export const UPDATE_EMPLOYEE = "UPDATE_EMPLOYEE"

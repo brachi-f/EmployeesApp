@@ -7,8 +7,10 @@ import { useParams } from 'react-router-dom'
 import * as empService from '../services/employees'
 import { FormLabel, FormControl, MenuItem, Select, Switch, TextField, InputLabel, OutlinedInput } from '@mui/material'
 import { useMemo } from 'react'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { Cake, CalendarToday, Contacts, Person, Today } from '@mui/icons-material'
+import * as actions from '../store/action'
+
 
 
 
@@ -17,7 +19,7 @@ const Edit = () => {
     const [roles, setRoles] = useState([]);
     let { id } = useParams();
     const roleList = useSelector(s => s.roles);
-
+    const dispatch = useDispatch()
     useEffect(() => {
         empService.getEmployeeById(id).then(res => {
             setEmployee(res.data)
@@ -70,20 +72,26 @@ const Edit = () => {
     }, [roles])
 
     const send = (data) => {
-        console.log(data.roles)
-        empService.updateEmployeeFields(data.id, data).then(res =>
+        empService.updateEmployeeFields(data.id, data).then(res => {
             console.log('fields updated successfully!')
+            dispatch({ type: actions.UPDATE_EMPLOYEE, data: res.data })
+        }
         ).catch(err => console.error(err))
         data.roles.forEach(r => {
-            let roleToSend = { roleId: r.roleId, employeeId: id, dateStart: r.dateStart, management: r.management }
-
+            let roleToSend = { roleId: r.roleId, employeeId: id, dateStart: new Date(r.dateStart), management: r.management }
+            let existing = roles.find(l => l.id == r.id)
+            console.log("role:", new Date(r.dateStart).toDateString(), "exist", new Date(existing.dateStart).toDateString())
             //post
-            if (roles.find(l => l.id == r.id))
+            let change = !(existing.management === r.management &&
+                existing.roleId === r.roleId
+                && new Date(existing.dateStart).toDateString() === new Date(r.dateStart).toDateString())
+            console.log(existing)
+            if (existing && change)
                 empService.updateEmpRole(r.id, roleToSend).then(res => {
                     console.log('role updated', res.data)
                 }).catch(err => console.error('error at updated role', r, err))
             //put
-            else
+            else if (!existing)
                 empService.addEmpRole({ ...roleToSend, id: r.id }).then(res => {
                     console.log('role added', res.data)
                 }).catch(err => console.error('error at add role', r, err))

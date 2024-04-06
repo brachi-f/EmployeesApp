@@ -13,6 +13,12 @@ const reducer = (state = initialState, action) => {
         case actionsNames.GET_ROLES: {
             return { ...state, roles: action.data }
         }
+        case actionsNames.UPDATE_EMPLOYEE: {
+            let list = state.employees
+            let index = list.findIndex(l => l.id == action.data.id)
+            list[index] = action.data
+            return { ...state, employees: list }
+        }
         default: {
             return { ...state }
         }
