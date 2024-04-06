@@ -1,9 +1,10 @@
+import Swal from 'sweetalert2'
 import React, { useEffect, useState } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { Button, ButtonContent, Form, Icon, Segment, SegmentGroup } from 'semantic-ui-react'
 import * as yup from 'yup'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import * as empService from '../services/employees'
 import { FormLabel, FormControl, MenuItem, Select, Switch, TextField, InputLabel, OutlinedInput } from '@mui/material'
 import { useMemo } from 'react'
@@ -20,6 +21,7 @@ const Edit = () => {
     let { id } = useParams();
     const roleList = useSelector(s => s.roles);
     const dispatch = useDispatch()
+    const navigate = useNavigate()
     useEffect(() => {
         empService.getEmployeeById(id).then(res => {
             setEmployee(res.data)
@@ -71,7 +73,7 @@ const Edit = () => {
         })
     }, [roles])
 
-    const send = (data) => {
+    /*const send = (data) => {
         empService.updateEmployeeFields(data.id, data).then(res => {
             console.log('fields updated successfully!')
             dispatch({ type: actions.UPDATE_EMPLOYEE, data: res.data })
@@ -80,12 +82,10 @@ const Edit = () => {
         data.roles.forEach(r => {
             let roleToSend = { roleId: r.roleId, employeeId: id, dateStart: new Date(r.dateStart), management: r.management }
             let existing = roles.find(l => l.id == r.id)
-            console.log("role:", new Date(r.dateStart).toDateString(), "exist", new Date(existing.dateStart).toDateString())
             //post
             let change = !(existing.management === r.management &&
                 existing.roleId === r.roleId
                 && new Date(existing.dateStart).toDateString() === new Date(r.dateStart).toDateString())
-            console.log(existing)
             if (existing && change)
                 empService.updateEmpRole(r.id, roleToSend).then(res => {
                     console.log('role updated', res.data)
@@ -103,7 +103,59 @@ const Edit = () => {
                     console.log('deleted')
                 }).catch(err => console.error('error at delete role', err))
         })
-    }
+    }*/
+    const send = async (data) => {
+        try {
+            // Array to keep track of errors
+            let errors = [];
+
+            // Update employee fields
+            await empService.updateEmployeeFields(data.id, data);
+            console.log('Fields updated successfully!');
+            dispatch({ type: actions.UPDATE_EMPLOYEE, data: data });
+
+            // Array of Promise to store all role update promises
+            let rolePromises = data.roles.map(async (r) => {
+                let roleToSend = { roleId: r.roleId, employeeId: id, dateStart: new Date(r.dateStart), management: r.management };
+                let existing = roles.find(l => l.id === r.id);
+
+                if (existing) {
+                    let change = !(existing.management === r.management && existing.roleId === r.roleId && new Date(existing.dateStart).toDateString() === new Date(r.dateStart).toDateString());
+
+                    if (change) {
+                        await empService.updateEmpRole(r.id, roleToSend);
+                        console.log('Role updated', r);
+                    }
+                } else {
+                    await empService.addEmpRole({ ...roleToSend, id: r.id });
+                    console.log('Role added', r);
+                }
+            });
+
+            // Await all role update promises
+            await Promise.all(rolePromises);
+
+            // Delete roles not present in the updated data
+            let deletePromises = roles.filter(r => !data.roles.some(l => l.id === r.id))
+                .map(async (r) => {
+                    await empService.deleteEmpRole(r.id);
+                    console.log('Role deleted', r);
+                });
+
+            // Await all role delete promises
+            await Promise.all(deletePromises);
+            Swal.fire({
+                icon: 'success',
+                title: 'update successfully',
+                showConfirmButton: false,
+                timer: 2000
+            })
+            navigate('/employees')
+
+        } catch (err) {
+            console.error('Error occurred during updates:', err);
+        }
+    };
     //to move up
     useEffect(() => {
         reset(employee);
