@@ -6,4 +6,6 @@
   text-align: center;
 }
 
-
+input{
+  border: 0px !important;
+}

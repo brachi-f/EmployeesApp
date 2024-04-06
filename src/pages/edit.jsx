@@ -87,7 +87,6 @@ const Edit = () => {
                 type='text'
                 margin='dense'
                 fullWidth
-                style={{ border: '0px' }}
                 InputProps={{
                     startAdornment: (
                         <Person />
@@ -97,7 +96,6 @@ const Edit = () => {
             <TextField
                 label='Family Name'
                 {...register("familyName")}
-                style={{ border: '0px' }}
                 InputProps={{
                     startAdornment: (
                         <Person />
@@ -115,7 +113,6 @@ const Edit = () => {
                 type='text'
                 margin='dense'
                 fullWidth
-                style={{ border: '0px' }}
                 InputProps={{
                     startAdornment: (
                         <Contacts />
@@ -129,7 +126,6 @@ const Edit = () => {
                 type='date'
                 margin='dense'
                 fullWidth
-                style={{ border: '0px' }}
                 InputProps={{
                     startAdornment: (
                         <Cake />
@@ -143,7 +139,6 @@ const Edit = () => {
                 type='date'
                 margin='dense'
                 fullWidth
-                style={{ border: '0px' }}
                 InputProps={{
                     startAdornment: (
                         <Today />
@@ -153,10 +148,10 @@ const Edit = () => {
             <Select
                 label='Gender'
                 {...register('gender')}
-                defaultValue='2'
+                defaultValue=''
                 fullWidth
             >
-                <MenuItem value='2' disabled >
+                <MenuItem value='' disabled >
                     <Icon name='female' />|
                     <Icon name='male' />
                     Gender</MenuItem>
@@ -194,7 +189,6 @@ const Edit = () => {
                                 {...register(`roles.${index}.dateStart`)}
                                 variant='standard'
                                 margin='dense'
-                                style={{ border: '0px' }}
                                 InputProps={{
                                     startAdornment: (
                                         <CalendarToday />
