@@ -13,12 +13,24 @@ export const getEmployeesDispatch = (status) => {
         })
     }
 }
-export const deleteEmployee = (id)=>{
-    return axios.put(baseURL+`/Employee/delete/${id}`)
+export const deleteEmployee = (id) => {
+    return axios.put(baseURL + `/Employee/delete/${id}`)
 }
-export const getEmployeeById=(id)=>{
-    return axios.get(baseURL+`/Employee/${id}`)
+export const getEmployeeById = (id) => {
+    return axios.get(baseURL + `/Employee/${id}`)
 }
-export const getRolesOfEmployee=(id)=>{
-    return axios.get(baseURL+`/Employee/${id}/role`)
+export const getRolesOfEmployee = (id) => {
+    return axios.get(baseURL + `/Employee/${id}/role`)
+}
+export const updateEmployeeFields = (id, emp) => {
+    return axios.put(baseURL + `/Employee/${id}`, emp)
+}
+export const deleteEmpRole = (id) => {
+    return axios.delete(baseURL + `/Employee/role/${id}`)
+}
+export const updateEmpRole = (id, role) => {
+    return axios.put(baseURL + `/Employee/role/${id}`, role)
+}
+export const addEmpRole = (role) => {
+    return axios.post(baseURL + `/Employee/role`, role)
 }

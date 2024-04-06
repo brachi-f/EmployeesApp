@@ -38,7 +38,7 @@ const Edit = () => {
         roles: yup.array().of(
             yup.object().shape({
                 id: yup.number(),
-                name: yup.number().required(),
+                roleId: yup.number().required(),
                 management: yup.bool().required(),
                 dateStart: yup.date().required()
             })
@@ -62,15 +62,39 @@ const Edit = () => {
         name: "roles",
     });
     useEffect(() => {
-        // RolesFields.forEach(r => RolesRemove(r))
+        RolesFields.forEach(r => RolesRemove(r))
         roles.forEach(r => {
             r.dateStart = new Date(r.dateStart).toISOString().substring(0, 10)
             RolesAppend(r)
         })
     }, [roles])
-    //to write on submit
+
     const send = (data) => {
-        console.log(data)
+        console.log(data.roles)
+        empService.updateEmployeeFields(data.id, data).then(res =>
+            console.log('fields updated successfully!')
+        ).catch(err => console.error(err))
+        data.roles.forEach(r => {
+            let roleToSend = { roleId: r.roleId, employeeId: id, dateStart: r.dateStart, management: r.management }
+
+            //post
+            if (roles.find(l => l.id == r.id))
+                empService.updateEmpRole(r.id, roleToSend).then(res => {
+                    console.log('role updated', res.data)
+                }).catch(err => console.error('error at updated role', r, err))
+            //put
+            else
+                empService.addEmpRole({ ...roleToSend, id: r.id }).then(res => {
+                    console.log('role added', res.data)
+                }).catch(err => console.error('error at add role', r, err))
+        })
+        //delete
+        roles.forEach(r => {
+            if (!data.roles.find(l => l.id == r.id))
+                empService.deleteEmpRole(r.id).then(res => {
+                    console.log('deleted')
+                }).catch(err => console.error('error at delete role', err))
+        })
     }
     //to move up
     useEffect(() => {
@@ -170,7 +194,7 @@ const Edit = () => {
                             <Form.Field>
                                 <FormLabel>Role</FormLabel>
                                 <select
-                                    {...register(`roles.${index}.name`)}
+                                    {...register(`roles.${index}.roleId`)}
                                     defaultValue={r.roleId}
                                 >
                                     {roleList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
@@ -201,7 +225,7 @@ const Edit = () => {
                         </Segment>
                     </SegmentGroup>
                 )}
-                <Button animated='vertical' size='big' onClick={() => RolesAppend({ id: 0, name: '', management: false })}>
+                <Button animated='vertical' size='big' onClick={() => RolesAppend({ id: 0, roleId: '', management: false })}>
                     <ButtonContent visible>Add Role</ButtonContent>
                     <ButtonContent hidden>
                         <Icon name='plus' />
