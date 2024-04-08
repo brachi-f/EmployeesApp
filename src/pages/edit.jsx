@@ -15,15 +15,16 @@ import * as actions from '../store/action'
 
 
 
-const Edit = ({id}) => {
+const Edit = () => {
     const [employee, setEmployee] = useState();
     const [roles, setRoles] = useState([]);
     const roleList = useSelector(s => s.roles);
     const dispatch = useDispatch()
     const navigate = useNavigate()
+    let { id } = useParams()
     useEffect(() => {
         console.log(id)
-        if (id) {
+        if (id > 0) {
             empService.getEmployeeById(id).then(res => {
                 setEmployee(res.data)
             }).catch(err => console.error("Error by getting employee by id: ", err))
@@ -163,143 +164,152 @@ const Edit = ({id}) => {
     }, [employee]);
 
     return (
-        <Form onSubmit={handleSubmit(send)}>
-            <TextField
-                autoFocus
-                label='First Name'
-                {...register("firstName")}
-                variant='standard'
-                type='text'
-                margin='dense'
-                fullWidth
-                InputProps={{
-                    startAdornment: (
-                        <Person />
-                    ),
-                }}
-            />
-            <TextField
-                label='Family Name'
-                {...register("familyName")}
-                InputProps={{
-                    startAdornment: (
-                        <Person />
-                    ),
-                }}
-                variant='standard'
-                type='text'
-                margin='dense'
-                fullWidth
-            />
-            <TextField
-                label='ID number'
-                {...register("identity")}
-                variant='standard'
-                type='text'
-                margin='dense'
-                fullWidth
-                InputProps={{
-                    startAdornment: (
-                        <Contacts />
-                    ),
-                }}
-            />
-            <TextField
-                label='Birth date'
-                {...register("dateOfBirth")}
-                variant='standard'
-                type='date'
-                margin='dense'
-                fullWidth
-                InputProps={{
-                    startAdornment: (
-                        <Cake />
-                    ),
-                }}
-            />
-            <TextField
-                label='Start date'
-                {...register("dateStart")}
-                variant='standard'
-                type='date'
-                margin='dense'
-                fullWidth
-                InputProps={{
-                    startAdornment: (
-                        <Today />
-                    ),
-                }}
-            />
-            <Select
-                label='Gender'
-                {...register('gender')}
-                defaultValue=''
-                fullWidth
-            >
-                <MenuItem value='' disabled >
-                    <Icon name='female' />|
-                    <Icon name='male' />
-                    Gender</MenuItem>
-                <MenuItem value='0' >
-                    <Icon name='female' />
-                    Female</MenuItem>
-                <MenuItem value='1' >
-                    <Icon name='male' />
-                    Male</MenuItem>
-            </Select>
-            <Segment>
-                <h4>Roles</h4>
-                {RolesFields.map((r, index) =>
-                    <SegmentGroup horizontal key={r.id}>
-                        <Segment>
-                            <Form.Field>
-                                <FormLabel>Role</FormLabel>
-                                <select
-                                    {...register(`roles.${index}.roleId`)}
-                                    defaultValue={r.roleId}
-                                >
-                                    {roleList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
-                                </select>
-                            </Form.Field>
-                        </Segment>
-                        <Segment>
-                            <FormLabel>A managerial position?</FormLabel>
-                            <br />
-                            <Switch {...register(`roles.${index}.management`)} defaultChecked={r.management} />
-                        </Segment>
-                        <Segment>
-                            <TextField
-                                label='date of start'
-                                type='date'
-                                {...register(`roles.${index}.dateStart`)}
-                                variant='standard'
-                                margin='dense'
-                                InputProps={{
-                                    startAdornment: (
-                                        <CalendarToday />
-                                    ),
-                                }}
-                            />
-                        </Segment>
-                        <Segment>
-                            <Button icon='trash' size='medium' onClick={() => { RolesRemove(index) }} />
-                        </Segment>
-                    </SegmentGroup>
-                )}
-                <Button animated='vertical' size='big' onClick={() => RolesAppend({ id: 0, roleId: '', management: false })}>
-                    <ButtonContent visible>Add Role</ButtonContent>
+        <Segment style={{ width: '60vw',backgroundColor: '#ffffffad' }}  color='purple' >
+            <Form onSubmit={handleSubmit(send)} >
+                <TextField
+                    autoFocus
+                    color='secondary'
+                    label='First Name'
+                    {...register("firstName")}
+                    variant='outlined'
+                    type='text'
+                    margin='dense'
+                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <Person />
+                        ),
+                    }}
+                />
+                <TextField
+                    label='Family Name'
+                    color='secondary'
+                    {...register("familyName")}
+                    InputProps={{
+                        startAdornment: (
+                            <Person />
+                        ),
+                    }}
+                    variant='standard'
+                    type='text'
+                    margin='dense'
+                    fullWidth
+                />
+                <TextField
+                    label='ID number'
+                    color='secondary'
+                    {...register("identity")}
+                    variant='standard'
+                    type='text'
+                    margin='dense'
+                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <Contacts />
+                        ),
+                    }}
+                />
+                <TextField
+                    label='Birth date'
+                    color='secondary'
+                    {...register("dateOfBirth")}
+                    variant='standard'
+                    type='date'
+                    margin='dense'
+                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <Cake />
+                        ),
+                    }}
+                />
+                <TextField
+                    label='Start date'
+                    {...register("dateStart")}
+                    color='secondary'
+                    variant='standard'
+                    type='date'
+                    margin='dense'
+                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <Today/>
+                        ),
+                    }}
+                />
+                <Select
+                    label='Gender'
+                    color='secondary'
+                    {...register('gender')}
+                    defaultValue=''
+                    fullWidth
+                >
+                    <MenuItem value='' disabled >
+                        <Icon name='female' />|
+                        <Icon name='male' />
+                        Gender</MenuItem>
+                    <MenuItem value='0'>
+                        <Icon name='female' />
+                        Female</MenuItem>
+                    <MenuItem value='1' >
+                        <Icon name='male' />
+                        Male</MenuItem>
+                </Select>
+                <Segment color='purple' style={{backgroundColor: 'transparent'}}>
+                    <h4>Roles</h4>
+                    {RolesFields.map((r, index) =>
+                        <SegmentGroup horizontal key={r.id} style={{backgroundColor: 'transparent'}}>
+                            <Segment color='purple'>
+                                <Form.Field  color='secondary'>
+                                    <FormLabel>Role</FormLabel>
+                                    <select
+                                        {...register(`roles.${index}.roleId`)}
+                                        defaultValue={r.roleId}
+                                    >
+                                        {roleList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                                    </select>
+                                </Form.Field>
+                            </Segment>
+                            <Segment color='purple' style={{backgroundColor: 'transparent'}}>
+                                <FormLabel>A managerial position?</FormLabel>
+                                <br />
+                                <Switch  color='secondary' {...register(`roles.${index}.management`)} defaultChecked={r.management} />
+                            </Segment>
+                            <Segment color='purple' style={{backgroundColor: 'transparent'}}>
+                                <TextField
+                                 color='secondary'
+                                    label='date of start'
+                                    type='date'
+                                    {...register(`roles.${index}.dateStart`)}
+                                    variant='standard'
+                                    margin='dense'
+                                    InputProps={{
+                                        startAdornment: (
+                                            <CalendarToday />
+                                        ),
+                                    }}
+                                />
+                            </Segment>
+                            <Segment color='purple' style={{backgroundColor: 'transparent'}}>
+                                <Button color='purple' icon='trash' size='medium' onClick={() => { RolesRemove(index) }} />
+                            </Segment>
+                        </SegmentGroup>
+                    )}
+                    <Button color='purple' animated='vertical' size='big' onClick={() => RolesAppend({ id: 0, roleId: '', management: false })}>
+                        <ButtonContent visible>Add Role</ButtonContent>
+                        <ButtonContent hidden>
+                            <Icon name='plus' />
+                        </ButtonContent>
+                    </Button>
+                </Segment>
+                <Button color='purple' animated='vertical' type='submit'>
+                    <ButtonContent visible>Save Changes</ButtonContent>
                     <ButtonContent hidden>
-                        <Icon name='plus' />
+                        <Icon name='save' />
                     </ButtonContent>
                 </Button>
-            </Segment>
-            <Button animated='vertical' type='submit'>
-                <ButtonContent visible>Save Changes</ButtonContent>
-                <ButtonContent hidden>
-                    <Icon name='save' />
-                </ButtonContent>
-            </Button>
-        </Form >
+            </Form >
+        </Segment>
     )
 
 }

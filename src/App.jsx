@@ -18,13 +18,16 @@ function App() {
   }, [])
   return (
     <>
-      {/* <Edit id='1002' /> */}
+     
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/employees' element={<List />} />
-        {/* <Route path='/employees/:id' element={<Edit />} /> */}
-        {/* <Route path='/employees/add' element={<Edit />} /> */}
+        <Route path='/employees/edit/:id' element={<Edit />} />
+        <Route path='/employees/add' element={<Edit />} />
       </Routes>
+      {/* <div className='image'> */}
+        <img className='image' src='https://img.freepik.com/premium-photo/business-office-design-background-ui-ux-design_155807-284.jpg?w=2000'/> 
+      {/* </div> */}
     </>
   )
 }
