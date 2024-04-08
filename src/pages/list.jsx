@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { useEffect, useState } from "react"
 import { debounce } from 'lodash'
 import { utils, write } from 'xlsx'
-import { Axios } from "axios"
+
 const List = () => {
     const navigate = useNavigate()
     const editEmp = (id) => {
