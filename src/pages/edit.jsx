@@ -164,6 +164,8 @@ const Edit = () => {
     }, [employee]);
 
     return (
+      <div className='container'>
+
         <Segment style={{ width: '60vw',backgroundColor: '#ffffffad' }}  color='purple' >
             <Form onSubmit={handleSubmit(send)} >
                 <TextField
@@ -310,6 +312,7 @@ const Edit = () => {
                 </Button>
             </Form >
         </Segment>
+        </div>
     )
 
 }
