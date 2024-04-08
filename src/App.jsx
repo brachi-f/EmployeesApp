@@ -13,15 +13,17 @@ import { getRolesDispatch } from './services/roles'
 function App() {
   const dispatch = useDispatch()
   useEffect(() => {
-      dispatch(getEmployeesDispatch(true))
-      dispatch(getRolesDispatch())
+    dispatch(getEmployeesDispatch(true))
+    dispatch(getRolesDispatch())
   }, [])
   return (
     <>
+      {/* <Edit id='1002' /> */}
       <Routes>
         <Route path='/' element={<Home />} />
-        <Route path='/employees' element={<List/>} />
-        <Route path='/employees/:id' element={<Edit/>}/>
+        <Route path='/employees' element={<List />} />
+        {/* <Route path='/employees/:id' element={<Edit />} /> */}
+        {/* <Route path='/employees/add' element={<Edit />} /> */}
       </Routes>
     </>
   )

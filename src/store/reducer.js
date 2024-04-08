@@ -19,6 +19,11 @@ const reducer = (state = initialState, action) => {
             list[index] = action.data
             return { ...state, employees: list }
         }
+        case actionsNames.ADD_EMPOLOYEE: {
+            let list = state.employees
+            list.push(action.data)
+            return { ...state, employees: list }
+        }
         default: {
             return { ...state }
         }
