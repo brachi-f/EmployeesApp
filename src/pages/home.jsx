@@ -10,7 +10,7 @@ const Home = () => {
     const navigate = useNavigate()
     return (
         <>
-            <Link to={'/employees'}>List</Link>
+            {/* <Link to={'/employees'}>List</Link> */}
         </>
     )
 

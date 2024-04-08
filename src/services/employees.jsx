@@ -13,6 +13,9 @@ export const getEmployeesDispatch = (status) => {
         })
     }
 }
+export const getAllEmployees = () => {
+    return axios.get(baseURL + '/Employee')
+}
 export const addEmployee = (emp) => {
     return axios.post(baseURL + `/Employee`, emp)
 }

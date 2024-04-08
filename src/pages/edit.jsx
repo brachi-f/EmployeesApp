@@ -173,7 +173,7 @@ const Edit = () => {
                     color='secondary'
                     label='First Name'
                     {...register("firstName")}
-                    variant='outlined'
+                    variant='standard'
                     type='text'
                     margin='dense'
                     fullWidth
