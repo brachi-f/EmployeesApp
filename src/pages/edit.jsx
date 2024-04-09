@@ -16,20 +16,24 @@ import * as actions from '../store/action'
 
 
 const Edit = () => {
+    // const [render, setRender] = useState(true)
+    const [selectedRoleIds, setSelectedRoleIds] = useState([]);
     const [employee, setEmployee] = useState();
     const [roles, setRoles] = useState([]);
+    const [options, setOptions] = useState([]);
     const roleList = useSelector(s => s.roles);
     const dispatch = useDispatch()
     const navigate = useNavigate()
     let { id } = useParams()
     useEffect(() => {
-        console.log(id)
+        //console.log(id)
         if (id > 0) {
             empService.getEmployeeById(id).then(res => {
                 setEmployee(res.data)
             }).catch(err => console.error("Error by getting employee by id: ", err))
             empService.getRolesOfEmployee(id).then(res => {
                 setRoles(res.data)
+                setSelectedRoleIds(res.data.map((r) => { return r.roleId.toString() }))
             }).catch(err => console.error('Error by getting roles of employee: ', err))
         }
     }, [])
@@ -41,10 +45,6 @@ const Edit = () => {
         dateOfBirth: yup.date('Birth date is required').required('Birth date is required'),
         dateStart: yup.date()
             .required('Start date is required')
-            // .transform((value, originalValue) => {
-            //     const parsedDate = parse(originalValue, 'dd/MM/yyyy', new Date());
-            //     return parsedDate;
-            // })
             .min(yup.ref('dateOfBirth'), 'Start date must be later than the birth date'),
         gender: yup.number().max(1).required(),
         status: yup.bool().default(true),
@@ -55,14 +55,8 @@ const Edit = () => {
                 management: yup.bool().required(),
                 dateStart: yup.date()
                     .required('Role start date is required')
-                    // .transform((value, originalValue) => {
-                    //     const parsedDate = parse(originalValue, 'dd/MM/yyyy', new Date());
-                    //     return parsedDate;
-                    // })
                     .test('start-date-comparison', 'Role start date must be later than job start date', function (value) {
-                        const mainDateStart = this.from?.[this.from.length-1].value.dateStart;
-                        console.log('Main dateStart:', new Date(mainDateStart));
-                        console.log('Role dateStart:',value);
+                        const mainDateStart = this.from?.[this.from.length - 1].value.dateStart;
                         return value > new Date(mainDateStart);
                     })
             })
@@ -90,9 +84,9 @@ const Edit = () => {
         dateStart: errors.dateStart ? (errors.dateStart.ref.value == "" ? 'start date is required' : errors.dateStart.message) : '',
         gender: errors.gender ? errors.gender.message : '',
         roles: errors.roles ? errors.roles.map(roleError => ({
-            roleId: roleError.roleId ? roleError.roleId.message : '',
-            management: roleError.management ? roleError.management.message : '',
-            dateStart: roleError.dateStart ? (roleError.dateStart.ref.value == "" ? 'role start date is required' : roleError.dateStart.message) : ''
+            roleId: roleError?.roleId ? roleError.roleId.message : '',
+            management: roleError?.management ? roleError.management.message : '',
+            dateStart: roleError?.dateStart ? (roleError.dateStart.ref.value == "" ? 'role start date is required' : roleError.dateStart.message) : ''
         })) : []
     };
     const { fields: RolesFields, append: RolesAppend, remove: RolesRemove, } = useFieldArray({
@@ -107,7 +101,6 @@ const Edit = () => {
             RolesAppend(r)
         })
     }, [roles])
-    //console.log("errors:", errors)
     const send = async (data) => {
         if (!id) {
             empService.addEmployee(data).then(res => {
@@ -190,11 +183,45 @@ const Edit = () => {
                 console.error('Error occurred during updates:', err);
             }
     };
-    //to move up
     useEffect(() => {
         reset(employee);
     }, [employee]);
+    /******************************************************************** */
+    // State to store selected role IDs
 
+    // Function to update role options based on selections
+    const handleRoleSelect = (e, index, roleId) => {
+        console.log("choose role:", index, roleId)
+        console.log("selected roles: ", selectedRoleIds)
+        // Update selected role ID for the specific index
+        const newSelectedRoleIds = getValues().roles.map((r => { console.log(r.roleId); return r.roleId }));
+        if (selectedRoleIds.includes(roleId)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'This role already exists for this employee',
+                showConfirmButton: false,
+                timer: 1500
+            })
+            e.target.value = '';
+            newSelectedRoleIds[index] = ''
+        }
+        else {
+            console.log("form value", getValues().roles)
+            newSelectedRoleIds[index] = roleId
+        }
+        console.log("new selected roles: ", newSelectedRoleIds)
+        setSelectedRoleIds(newSelectedRoleIds);
+    };
+
+
+    // Update role options on role selection change
+    // useEffect(() => {
+    //     console.log("change selected roles", selectedRoleIds)
+    //     setOptions(roleList.map((r) => ({ key: r.id, name: r.name })))
+    //     console.log(options)
+    //     setRender(!render)
+    // }, [selectedRoleIds, roleList]);
+    /******************************************************************** */
     return (
         <div className='container'>
 
@@ -311,18 +338,41 @@ const Edit = () => {
                                         <select
                                             {...register(`roles.${index}.roleId`)}
                                             defaultValue={r.roleId}
+                                            onChange={(e) => handleRoleSelect(e, index, e.target.value)}
                                         >
                                             {roleList.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
                                         </select>
                                     </Form.Field>
                                 </Segment>
+                                {/* <Segment key={render} color='purple'>
+                                    <Form.Field color='secondary'>
+                                        <FormLabel>Role</FormLabel>
+                                        <select
+                                            {...register(`roles.${index}.roleId`)}
+                                            defaultValue={r.roleId}
+                                        //disabled={selectedRoleIds.includes(r.roleId) && selectedRoleIds[index] !== r.roleId}
+                                        >
+                                            {/* {console.log('selected roles:', selectedRoleIds)} */}
+                                {/* {roleList.map((role) => (
+                                                <option key={role.id} value={role.id} disabled={checkDisalbe(selectedRoleIds,role.id)}>
+                                                    {role.name}
+                                                </option>
+                                            ))} 
+                                            */}
+                                {/* {options.map((op) => {
+                                                <option key={op.key} value={op.key} disabled={checkDisalbe(selectedRoleIds, op.key)}>
+                                                    {op.name}
+                                                </option>
+                                            })}
+                                        </select>
+                                    </Form.Field>
+                                </Segment>  */}
                                 <Segment color='purple' style={{ backgroundColor: 'transparent' }}>
                                     <FormLabel>A managerial position?</FormLabel>
                                     <br />
                                     <Switch color='secondary' {...register(`roles.${index}.management`)} defaultChecked={r.management} />
                                 </Segment>
                                 <Segment color='purple' style={{ backgroundColor: 'transparent' }}>
-                                    {console.log(errorMessages.roles)}
                                     <TextField
                                         color='secondary'
                                         label='date of start'
@@ -366,3 +416,6 @@ const Edit = () => {
 export default Edit;
 
 
+const checkDisalbe = (list, id) => {
+    return list.includes(id)
+}
