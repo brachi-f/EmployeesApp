@@ -16,17 +16,14 @@ import * as actions from '../store/action'
 
 
 const Edit = () => {
-    // const [render, setRender] = useState(true)
     const [selectedRoleIds, setSelectedRoleIds] = useState([]);
     const [employee, setEmployee] = useState();
     const [roles, setRoles] = useState([]);
-    const [options, setOptions] = useState([]);
     const roleList = useSelector(s => s.roles);
     const dispatch = useDispatch()
     const navigate = useNavigate()
     let { id } = useParams()
     useEffect(() => {
-        //console.log(id)
         if (id > 0) {
             empService.getEmployeeById(id).then(res => {
                 setEmployee(res.data)
@@ -186,14 +183,8 @@ const Edit = () => {
     useEffect(() => {
         reset(employee);
     }, [employee]);
-    /******************************************************************** */
-    // State to store selected role IDs
 
-    // Function to update role options based on selections
     const handleRoleSelect = (e, index, roleId) => {
-        console.log("choose role:", index, roleId)
-        console.log("selected roles: ", selectedRoleIds)
-        // Update selected role ID for the specific index
         const newSelectedRoleIds = getValues().roles.map((r => { console.log(r.roleId); return r.roleId }));
         if (selectedRoleIds.includes(roleId)) {
             Swal.fire({
@@ -206,22 +197,10 @@ const Edit = () => {
             newSelectedRoleIds[index] = ''
         }
         else {
-            console.log("form value", getValues().roles)
             newSelectedRoleIds[index] = roleId
         }
-        console.log("new selected roles: ", newSelectedRoleIds)
         setSelectedRoleIds(newSelectedRoleIds);
     };
-
-
-    // Update role options on role selection change
-    // useEffect(() => {
-    //     console.log("change selected roles", selectedRoleIds)
-    //     setOptions(roleList.map((r) => ({ key: r.id, name: r.name })))
-    //     console.log(options)
-    //     setRender(!render)
-    // }, [selectedRoleIds, roleList]);
-    /******************************************************************** */
     return (
         <div className='container'>
 
@@ -344,29 +323,6 @@ const Edit = () => {
                                         </select>
                                     </Form.Field>
                                 </Segment>
-                                {/* <Segment key={render} color='purple'>
-                                    <Form.Field color='secondary'>
-                                        <FormLabel>Role</FormLabel>
-                                        <select
-                                            {...register(`roles.${index}.roleId`)}
-                                            defaultValue={r.roleId}
-                                        //disabled={selectedRoleIds.includes(r.roleId) && selectedRoleIds[index] !== r.roleId}
-                                        >
-                                            {/* {console.log('selected roles:', selectedRoleIds)} */}
-                                {/* {roleList.map((role) => (
-                                                <option key={role.id} value={role.id} disabled={checkDisalbe(selectedRoleIds,role.id)}>
-                                                    {role.name}
-                                                </option>
-                                            ))} 
-                                            */}
-                                {/* {options.map((op) => {
-                                                <option key={op.key} value={op.key} disabled={checkDisalbe(selectedRoleIds, op.key)}>
-                                                    {op.name}
-                                                </option>
-                                            })}
-                                        </select>
-                                    </Form.Field>
-                                </Segment>  */}
                                 <Segment color='purple' style={{ backgroundColor: 'transparent' }}>
                                     <FormLabel>A managerial position?</FormLabel>
                                     <br />
@@ -414,8 +370,3 @@ const Edit = () => {
 
 }
 export default Edit;
-
-
-const checkDisalbe = (list, id) => {
-    return list.includes(id)
-}
