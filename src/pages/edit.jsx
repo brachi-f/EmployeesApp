@@ -11,7 +11,7 @@ import { useMemo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Cake, CalendarToday, Contacts, FamilyRestroomTwoTone, Person, Today } from '@mui/icons-material'
 import * as actions from '../store/action'
-
+// import { parse } from 'date-fns'
 
 
 
@@ -41,6 +41,10 @@ const Edit = () => {
         dateOfBirth: yup.date('Birth date is required').required('Birth date is required'),
         dateStart: yup.date()
             .required('Start date is required')
+            // .transform((value, originalValue) => {
+            //     const parsedDate = parse(originalValue, 'dd/MM/yyyy', new Date());
+            //     return parsedDate;
+            // })
             .min(yup.ref('dateOfBirth'), 'Start date must be later than the birth date'),
         gender: yup.number().max(1).required(),
         status: yup.bool().default(true),
@@ -49,7 +53,18 @@ const Edit = () => {
                 id: yup.number(),
                 roleId: yup.number().required(),
                 management: yup.bool().required(),
-                dateStart: yup.date().required()
+                dateStart: yup.date()
+                    .required('Role start date is required')
+                    // .transform((value, originalValue) => {
+                    //     const parsedDate = parse(originalValue, 'dd/MM/yyyy', new Date());
+                    //     return parsedDate;
+                    // })
+                    .test('start-date-comparison', 'Role start date must be later than job start date', function (value) {
+                        const mainDateStart = this.from?.[this.from.length-1].value.dateStart;
+                        console.log('Main dateStart:', new Date(mainDateStart));
+                        console.log('Role dateStart:',value);
+                        return value > new Date(mainDateStart);
+                    })
             })
         )
     })
@@ -74,6 +89,11 @@ const Edit = () => {
         dateOfBirth: errors.dateOfBirth ? (errors.dateOfBirth.ref.value == "" ? 'date of birth is required' : errors.dateOfBirth.message) : '',
         dateStart: errors.dateStart ? (errors.dateStart.ref.value == "" ? 'start date is required' : errors.dateStart.message) : '',
         gender: errors.gender ? errors.gender.message : '',
+        roles: errors.roles ? errors.roles.map(roleError => ({
+            roleId: roleError.roleId ? roleError.roleId.message : '',
+            management: roleError.management ? roleError.management.message : '',
+            dateStart: roleError.dateStart ? (roleError.dateStart.ref.value == "" ? 'role start date is required' : roleError.dateStart.message) : ''
+        })) : []
     };
     const { fields: RolesFields, append: RolesAppend, remove: RolesRemove, } = useFieldArray({
         control,
@@ -87,7 +107,7 @@ const Edit = () => {
             RolesAppend(r)
         })
     }, [roles])
-    console.log("errors:", errors)
+    //console.log("errors:", errors)
     const send = async (data) => {
         if (!id) {
             empService.addEmployee(data).then(res => {
@@ -302,11 +322,14 @@ const Edit = () => {
                                     <Switch color='secondary' {...register(`roles.${index}.management`)} defaultChecked={r.management} />
                                 </Segment>
                                 <Segment color='purple' style={{ backgroundColor: 'transparent' }}>
+                                    {console.log(errorMessages.roles)}
                                     <TextField
                                         color='secondary'
                                         label='date of start'
                                         type='date'
                                         {...register(`roles.${index}.dateStart`)}
+                                        error={!!errorMessages.roles?.[index]?.dateStart}
+                                        helperText={errorMessages.roles?.[index]?.dateStart}
                                         variant='standard'
                                         margin='dense'
                                         InputProps={{
